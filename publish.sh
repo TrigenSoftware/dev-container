@@ -18,6 +18,7 @@ docker buildx build \
   --platform "$PLATFORM" \
   --tag "$IMAGE_NAME:latest" \
   --file Dockerfile \
+  --no-cache \
   --push \
   .
 
@@ -32,6 +33,7 @@ docker buildx build \
   --platform "$PLATFORM" \
   --tag "$IMAGE_NAME:tunnel" \
   --file Dockerfile.tunnel \
+  --no-cache \
   --push \
   .
 

@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     nano \
+    htop \
+    psmisc \
     && rm -rf /var/lib/apt/lists/*
 
 # Locale configuration
