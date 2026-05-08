@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     unzip \
+    bubblewrap \
     build-essential \
     libssl-dev \
     zsh \
