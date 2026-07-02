@@ -67,6 +67,13 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Chromium (Ubuntu's apt package is a snap stub that doesn't work in Docker, so use the xtradeb PPA)
+RUN wget -nv -O- 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x5301FA4FD93244FBC6F6149982BB6851C64F6880' | gpg --dearmor > /etc/apt/keyrings/xtradeb.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/xtradeb.gpg] https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu noble main" > /etc/apt/sources.list.d/xtradeb.list \
+    && apt-get update \
+    && apt-get install -y chromium \
+    && rm -rf /var/lib/apt/lists/*
+
 # Locale configuration
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8
