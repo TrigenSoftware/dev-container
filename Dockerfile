@@ -76,7 +76,8 @@ RUN wget -nv -O- 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x5301FA
     && printf 'Package: *\nPin: release n=noble\nPin-Priority: 100\n' > /etc/apt/preferences.d/noble \
     && apt-get update \
     && apt-get install -y chromium \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/chromium /usr/local/bin/chrome
 
 # Locale configuration
 RUN locale-gen en_US.UTF-8
