@@ -67,9 +67,13 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chromium (Ubuntu's apt package is a snap stub that doesn't work in Docker, so use the xtradeb PPA)
+# Install Chromium (Ubuntu's apt package is a snap stub that doesn't work in Docker, so use the xtradeb PPA;
+# it has no plucky builds, so install the noble build and pin its two missing deps to the noble archive)
 RUN wget -nv -O- 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x5301FA4FD93244FBC6F6149982BB6851C64F6880' | gpg --dearmor > /etc/apt/keyrings/xtradeb.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/xtradeb.gpg] https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu noble main" > /etc/apt/sources.list.d/xtradeb.list \
+    && if [ "$(dpkg --print-architecture)" = "amd64" ]; then MIRROR=http://archive.ubuntu.com/ubuntu; else MIRROR=http://ports.ubuntu.com/ubuntu-ports; fi \
+    && echo "deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] $MIRROR noble main universe" > /etc/apt/sources.list.d/noble.list \
+    && printf 'Package: *\nPin: release n=noble\nPin-Priority: 100\n' > /etc/apt/preferences.d/noble \
     && apt-get update \
     && apt-get install -y chromium \
     && rm -rf /var/lib/apt/lists/*
