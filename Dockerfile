@@ -67,17 +67,17 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chromium (Ubuntu's apt package is a snap stub that doesn't work in Docker, so use the xtradeb PPA;
-# it has no plucky builds, so install the noble build and pin its two missing deps to the noble archive)
-RUN wget -nv -O- 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x5301FA4FD93244FBC6F6149982BB6851C64F6880' | gpg --dearmor > /etc/apt/keyrings/xtradeb.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/xtradeb.gpg] https://ppa.launchpadcontent.net/xtradeb/apps/ubuntu noble main" > /etc/apt/sources.list.d/xtradeb.list \
-    && if [ "$(dpkg --print-architecture)" = "amd64" ]; then MIRROR=http://archive.ubuntu.com/ubuntu; else MIRROR=http://ports.ubuntu.com/ubuntu-ports; fi \
-    && echo "deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] $MIRROR noble main universe" > /etc/apt/sources.list.d/noble.list \
-    && printf 'Package: *\nPin: release n=noble\nPin-Priority: 100\n' > /etc/apt/preferences.d/noble \
-    && apt-get update \
-    && apt-get install -y chromium \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/bin/chromium /usr/local/bin/chrome
+# Install Chrome via Playwright (its Chromium builds ship for both amd64 and arm64; node is only needed at build time)
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/ms-playwright
+RUN apt-get update \
+    && apt-get install -y nodejs npm \
+    && npx -y playwright@latest install chromium \
+    && ln -s "$(find $PLAYWRIGHT_BROWSERS_PATH -type f -name chrome -path '*chromium-*')" /usr/local/bin/chrome \
+    && ln -s /usr/local/bin/chrome /usr/local/bin/google-chrome \
+    && ln -s /usr/local/bin/chrome /usr/local/bin/google-chrome-stable \
+    && apt-get purge -y nodejs npm \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # Locale configuration
 RUN locale-gen en_US.UTF-8
