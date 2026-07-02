@@ -75,6 +75,9 @@ RUN apt-get update \
     && ln -s "$(find $PLAYWRIGHT_BROWSERS_PATH -type f -name chrome -path '*chromium-*')" /usr/local/bin/chrome \
     && ln -s /usr/local/bin/chrome /usr/local/bin/google-chrome \
     && ln -s /usr/local/bin/chrome /usr/local/bin/google-chrome-stable \
+    && mkdir -p /opt/google/chrome \
+    && printf '#!/bin/sh\nexec /usr/local/bin/google-chrome --no-sandbox --headless=new "$@"\n' > /opt/google/chrome/chrome \
+    && chmod +x /opt/google/chrome/chrome \
     && apt-get purge -y nodejs npm \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* /root/.npm
