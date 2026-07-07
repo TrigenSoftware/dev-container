@@ -10,6 +10,18 @@ RUN ARCH=$(uname -m) && \
     tar -xf vscode_cli.tar.gz -C /usr/local/bin && \
     rm vscode_cli.tar.gz
 
+# Install DevTunnel CLI (what https://aka.ms/DevTunnelCliInstall does, minus sudo and ~/bin)
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        curl -sL -o /usr/local/bin/devtunnel https://tunnelsassetsprod.blob.core.windows.net/cli/linux-x64-devtunnel; \
+    elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
+        curl -sL -o /usr/local/bin/devtunnel https://tunnelsassetsprod.blob.core.windows.net/cli/linux-arm64-devtunnel; \
+    fi && \
+    chmod +x /usr/local/bin/devtunnel && \
+    apt-get update && \
+    apt-get install -y libsecret-1-0 libicu76 && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV TUNNEL_NAME="dev-container"
 ENV TUNNEL_PROVIDER="github"
 
