@@ -25,7 +25,8 @@ RUN ARCH=$(uname -m) && \
 ENV TUNNEL_NAME="dev-container"
 ENV TUNNEL_PROVIDER="github"
 
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ADD tunnel.sh /tunnel.sh
+RUN chmod +x /tunnel.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Inherit the base image's home-seeding ENTRYPOINT; it execs this CMD after seeding
+CMD ["/tunnel.sh"]

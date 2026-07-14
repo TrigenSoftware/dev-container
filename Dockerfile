@@ -98,9 +98,17 @@ RUN echo 'source /scripts/vars.sh' >> ~/.zshrc
 # Install asdf
 RUN sh /scripts/asdf-install.sh
 
+# Snapshot the baked home so the entrypoint can re-seed it into a mounted volume
+RUN cp -a /root /opt/home-snapshot
+
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Set zsh as default shell
 ENV SHELL=/bin/zsh
+ENV HOME=/root
 
 WORKDIR /workspace
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["zsh"]

@@ -1,28 +1,12 @@
 #!/bin/sh
 set -e
 
-SETTINGS_JSON="/cache/vscode/server/data/Machine/settings.json"
+# Seed baked home configs (.zshrc, .oh-my-zsh, ...) into HOME. When HOME is a
+# freshly mounted host volume it starts empty and would otherwise shadow the
+# configs baked into the image. -n keeps any existing user/tool data intact, so
+# this also fills in newly baked configs after an image rebuild without touching
+# anything the user or a tool has already written.
+mkdir -p "$HOME"
+cp -an /opt/home-snapshot/. "$HOME/" 2>/dev/null || true
 
-if [ ! -f "$SETTINGS_JSON" ]; then
-  mkdir -p "$(dirname "$SETTINGS_JSON")"
-  cat > "$SETTINGS_JSON" <<EOF
-{
-  "git.decorations.enabled": true,
-  "explorer.decorations.colors": true,
-  "explorer.decorations.badges": true
-}
-EOF
-fi
-
-if [ ! -f "/cache/vscode/cli/token.json" ]; then
-  code tunnel user login \
-    --provider "$TUNNEL_PROVIDER" \
-    --cli-data-dir /cache/vscode/cli
-fi
-
-exec code tunnel \
-  --accept-server-license-terms \
-  --name "$TUNNEL_NAME" \
-  --cli-data-dir /cache/vscode/cli \
-  --server-data-dir /cache/vscode/server \
-  --extensions-dir /cache/vscode/extensions
+exec "$@"
