@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     nano \
     htop \
     psmisc \
+    tini \
     libglib2.0-0t64 \
     libnss3 \
     libnspr4 \
@@ -110,5 +111,6 @@ ENV HOME=/root
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/entrypoint.sh"]
+# tini runs as PID 1: it reaps orphaned processes, which would stay zombies otherwise, and passes signals on
+ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
 CMD ["zsh"]
